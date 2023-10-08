@@ -10,17 +10,20 @@ import javax.persistence.OneToOne;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 @Entity
 public class Postagem {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
 	
-	@NotEmpty
+	@NotNull
 	@OneToOne
 	private Usuario autor;
 	
 	@NotNull
+	@JsonFormat(pattern = "dd/MM/yyyy")
 	private Calendar data;
 	
 	@NotEmpty
