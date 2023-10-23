@@ -8,4 +8,6 @@ import com.backend.sustentabilidade.model.Forum;
 @Repository
 public interface ForumRepository extends PagingAndSortingRepository<Forum, Long>{
 	
+	
+	
 }

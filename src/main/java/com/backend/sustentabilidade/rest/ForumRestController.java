@@ -2,6 +2,7 @@ package com.backend.sustentabilidade.rest;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,9 +17,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.backend.sustentabilidade.model.Erro;
 import com.backend.sustentabilidade.model.Forum;
+import com.backend.sustentabilidade.model.ForumIntegrante;
 import com.backend.sustentabilidade.model.Sucesso;
 import com.backend.sustentabilidade.model.Usuario;
+import com.backend.sustentabilidade.repository.ForumIntegranteRepository;
 import com.backend.sustentabilidade.repository.ForumRepository;
+import com.backend.sustentabilidade.repository.UsuarioRepository;
 
 @CrossOrigin
 @RestController
@@ -28,6 +32,13 @@ public class ForumRestController {
 	@Autowired
 	private ForumRepository repository;
 	
+	@Autowired
+	private ForumIntegranteRepository fiRepository;
+	
+	@Autowired
+	private UsuarioRepository userRepository;
+	
+	
 	// Método que cria um novo Fórum
 	@RequestMapping(value = "", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Object> criarForum(@RequestBody Forum forum){
@@ -36,6 +47,8 @@ public class ForumRestController {
 			participantes.add(forum.getCriador());
 			forum.setIntegrantes(participantes);
 			repository.save(forum);
+			ForumIntegrante fi = new ForumIntegrante(forum.getCriador(), forum, true);
+			fiRepository.save(fi);
 			Sucesso sucesso = new Sucesso(HttpStatus.OK, "Sucesso");
 			return new ResponseEntity<Object>(sucesso, HttpStatus.OK);
 		} else {
@@ -75,4 +88,17 @@ public class ForumRestController {
 			return new ResponseEntity<Object>(sucesso, HttpStatus.OK);
 		}
 	}
+	
+	// Método para aprticipar do Fórum
+	@RequestMapping(value = "/{idForum}/{idUser}", method = RequestMethod.PUT)
+	public ResponseEntity<Object> participarForum(@PathVariable("idForum") Long idForum, @PathVariable("idUser") Long idUser){
+		Optional<Forum> forum = repository.findById(idForum);
+		Optional<Usuario> user = userRepository.findById(idUser);
+		forum.get().getIntegrantes().add(user.get());
+		repository.save(forum.get());
+		Sucesso sucesso = new Sucesso(HttpStatus.OK, "Sucesso");
+		return new ResponseEntity<Object>(sucesso, HttpStatus.OK);
+	}
+	
+	
 }

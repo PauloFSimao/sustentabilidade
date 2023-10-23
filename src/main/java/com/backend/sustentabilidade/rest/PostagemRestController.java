@@ -14,8 +14,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.backend.sustentabilidade.model.Erro;
+import com.backend.sustentabilidade.model.ForumIntegrante;
 import com.backend.sustentabilidade.model.Postagem;
 import com.backend.sustentabilidade.model.Sucesso;
+import com.backend.sustentabilidade.model.Usuario;
+import com.backend.sustentabilidade.repository.ForumIntegranteRepository;
 import com.backend.sustentabilidade.repository.PostagemRepository;
 
 @CrossOrigin
@@ -26,11 +29,22 @@ public class PostagemRestController {
 	@Autowired
 	private PostagemRepository repository;
 	
+	@Autowired
+	private SenderEmail senderEmail;
+	
+	@Autowired
+	private ForumIntegranteRepository fiRepository;
+	
 	// Método que salva a postagem 
 	@RequestMapping(value = "", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Object> salvarPostagem(@RequestBody Postagem post){
 		if(post != null) {
 			repository.save(post);
+			List<ForumIntegrante> ativos = fiRepository.buscaAtivos(post.getForum());
+			for(int i = 0; i < ativos.size(); i++) {
+				senderEmail.enviar(ativos.get(i).getParticipante().getEmail(), ativos.get(i).getForum().getNome(), ativos.get(i).getParticipante().getNome());
+			}
+			
 			Sucesso sucesso = new Sucesso(HttpStatus.OK, "Sucesso");
 			return new ResponseEntity<Object>(sucesso, HttpStatus.OK);
 		} else {

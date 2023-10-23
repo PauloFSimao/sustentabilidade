@@ -1,10 +1,15 @@
 package com.backend.sustentabilidade.config;
 
+import java.util.Properties;
+
 import javax.sql.DataSource;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.mail.MailSender;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.orm.jpa.JpaVendorAdapter;
 import org.springframework.orm.jpa.vendor.Database;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
@@ -32,8 +37,6 @@ public class AppConfig implements WebMvcConfigurer{
 		return driver;
 	}
 	
-	
-	
 	@Bean
     public JpaVendorAdapter jpaVendorAdapter() {
         
@@ -46,4 +49,25 @@ public class AppConfig implements WebMvcConfigurer{
         
         return adapter;
     }
+	
+	@Bean
+	public JavaMailSender javaMailSender() {
+		JavaMailSenderImpl sender = new JavaMailSenderImpl();
+		
+		sender.setHost("smtp.gmail.com");
+		sender.setPort(587);
+		sender.setUsername("fs1898117@gmail.com");
+		sender.setPassword("yyct xplt bprs nydz");
+		
+		Properties props = new Properties();
+		props.put("mail.transport.protocol", "smtp");
+		props.put("mail.smtp.auth", true);
+		props.put("mail.smtp.starttls.enable", true);
+		props.put("mail.smtp.connectiontimeout", 10000);
+		
+		sender.setJavaMailProperties(props);
+		
+		return sender;
+		
+	}
 }
