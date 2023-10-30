@@ -23,7 +23,7 @@ public class Usuario {
 	private String nome;
 	
 	@NotNull
-	@JsonFormat(pattern = "dd/MM/yyyy")
+	@JsonFormat(pattern = "yyyy-MM-dd")
 	private Calendar dataNasc;
 	
 	@NotEmpty

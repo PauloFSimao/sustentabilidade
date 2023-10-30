@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.backend.sustentabilidade.model.Erro;
 import com.backend.sustentabilidade.model.Sucesso;
+import com.backend.sustentabilidade.model.TipoUsuario;
 import com.backend.sustentabilidade.model.Usuario;
 import com.backend.sustentabilidade.repository.UsuarioRepository;
 
@@ -30,9 +31,16 @@ public class UsuarioRestController {
 	@RequestMapping(value = "", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Object> salvarUsuario(@RequestBody Usuario user){
 		if(user != null) {
+			if(user.getTipoUsuario() == null) {
+				user.setTipoUsuario(TipoUsuario.USUARIO);
+			}
 			repository.save(user);
 			Sucesso sucesso = new Sucesso(HttpStatus.OK, "Sucesso");
-			ResponseEntity<Object> ok = new ResponseEntity<Object>(sucesso, HttpStatus.OK);
+			Object resp[] = new Object[3];
+			resp[0] = sucesso;
+			resp[1] = user.getId();
+			resp[2] = user.getUserName();
+			ResponseEntity<Object> ok = new ResponseEntity<Object>(resp, HttpStatus.OK);
 			
 			return ok;
 		} else {
