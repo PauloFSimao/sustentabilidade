@@ -1,5 +1,7 @@
 package com.backend.sustentabilidade.rest;
 
+import java.time.LocalDate;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
 
@@ -36,6 +38,7 @@ public class MensagemRestController {
 	@RequestMapping(value = "", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Object> mandarMensagem(@RequestBody Mensagem msg){
 		if(msg != null) {
+			msg.setData(LocalDate.now());
 			repository.save(msg);
 			Sucesso sucesso = new Sucesso(HttpStatus.OK, "Sucesso");
 			return new ResponseEntity<Object>(sucesso, HttpStatus.OK);
@@ -51,5 +54,11 @@ public class MensagemRestController {
 		Usuario dest = userRepository.findById(idDest).get();
 		Usuario rem = userRepository.findById(idRem).get();
 		return repository.findEntreUser(dest, rem);
+	}
+	
+	@RequestMapping(value = "/{idRem}", method = RequestMethod.GET)
+	public List<Usuario> buscaHistorico(@PathVariable("idRem") Long id){
+		Usuario rem = userRepository.findById(id).get();
+		return repository.buscaHistorico(rem);
 	}
 }

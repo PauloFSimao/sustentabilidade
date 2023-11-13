@@ -26,7 +26,6 @@ public class Usuario {
 	@JsonFormat(pattern = "yyyy-MM-dd")
 	private Calendar dataNasc;
 	
-	@NotEmpty
 	private String senha;
 	
 	@Email
@@ -38,7 +37,6 @@ public class Usuario {
 	@Column(unique = true)
 	private String userName;
 	
-	@NotNull
 	private TipoUsuario tipoUsuario;
 	
 	@NotNull

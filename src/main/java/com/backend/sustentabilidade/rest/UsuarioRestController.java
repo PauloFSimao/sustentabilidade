@@ -1,6 +1,7 @@
 package com.backend.sustentabilidade.rest;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -80,5 +81,11 @@ public class UsuarioRestController {
 			return new ResponseEntity<Object>(sucesso, HttpStatus.OK);
 			
 		}
+	}
+	
+	// Método que busca o usuário pelo id
+	@RequestMapping(value = "/{id}", method = RequestMethod.GET)
+	public Optional<Usuario> buscaPorId(@PathVariable("id") Long id){
+		return repository.findById(id);
 	}
 }
