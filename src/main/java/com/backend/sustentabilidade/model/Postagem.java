@@ -1,5 +1,6 @@
 package com.backend.sustentabilidade.model;
 
+import java.time.LocalDate;
 import java.util.Calendar;
 
 import javax.persistence.Entity;
@@ -22,9 +23,8 @@ public class Postagem {
 	@OneToOne
 	private Usuario autor;
 	
-	@NotNull
 	@JsonFormat(pattern = "dd/MM/yyyy")
-	private Calendar data;
+	private LocalDate data;
 	
 	@NotEmpty
 	private String conteudo;
@@ -49,11 +49,11 @@ public class Postagem {
 		this.autor = autor;
 	}
 
-	public Calendar getData() {
+	public LocalDate getData() {
 		return data;
 	}
 
-	public void setData(Calendar data) {
+	public void setData(LocalDate data) {
 		this.data = data;
 	}
 

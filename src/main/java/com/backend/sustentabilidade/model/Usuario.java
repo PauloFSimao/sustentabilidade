@@ -1,17 +1,20 @@
 package com.backend.sustentabilidade.model;
 
 import java.util.Calendar;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 public class Usuario {
@@ -37,19 +40,31 @@ public class Usuario {
 	@Column(unique = true)
 	private String userName;
 	
-	private TipoUsuario tipoUsuario;
+	@JsonIgnore
+	@ManyToMany(mappedBy = "integrantes")
+	private List<Forum> foruns;
 	
 	@NotNull
 	private String bio;
+	
+	@Column(columnDefinition = "LONGTEXT")
+	private String foto;
 
-	public TipoUsuario getTipoUsuario() {
-		return tipoUsuario;
+	public List<Forum> getForuns() {
+		return foruns;
 	}
 
-	public void setTipoUsuario(TipoUsuario tipoUsuario) {
-		this.tipoUsuario = tipoUsuario;
+	public void setForuns(List<Forum> foruns) {
+		this.foruns = foruns;
 	}
 
+	public String getFoto() {
+		return foto;
+	}
+
+	public void setFoto(String foto) {
+		this.foto = foto;
+	}
 
 	public Long getId() {
 		return id;

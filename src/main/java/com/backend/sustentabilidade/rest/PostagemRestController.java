@@ -1,6 +1,8 @@
 package com.backend.sustentabilidade.rest;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -14,11 +16,13 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.backend.sustentabilidade.model.Erro;
+import com.backend.sustentabilidade.model.Forum;
 import com.backend.sustentabilidade.model.ForumIntegrante;
 import com.backend.sustentabilidade.model.Postagem;
 import com.backend.sustentabilidade.model.Sucesso;
 import com.backend.sustentabilidade.model.Usuario;
 import com.backend.sustentabilidade.repository.ForumIntegranteRepository;
+import com.backend.sustentabilidade.repository.ForumRepository;
 import com.backend.sustentabilidade.repository.PostagemRepository;
 
 @CrossOrigin
@@ -35,10 +39,14 @@ public class PostagemRestController {
 	@Autowired
 	private ForumIntegranteRepository fiRepository;
 	
+	@Autowired
+	private ForumRepository forumRepository;
+	
 	// Método que salva a postagem 
 	@RequestMapping(value = "", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Object> salvarPostagem(@RequestBody Postagem post){
 		if(post != null) {
+			post.setData(LocalDate.now());
 			repository.save(post);
 			List<ForumIntegrante> ativos = fiRepository.buscaAtivos(post.getForum());
 			for(int i = 0; i < ativos.size(); i++) {
@@ -89,6 +97,13 @@ public class PostagemRestController {
 	@RequestMapping(value = "/{palavra}", method = RequestMethod.GET)
 	public List<Postagem> buscaPorPalavra(@PathVariable("palavra") String palavra){
 		return repository.buscaPalavra(palavra);
+	}
+	
+	// Método que retorna todas as postagens de um fórum
+	@RequestMapping(value = "/forum/{idForum}", method = RequestMethod.GET)
+	public List<Postagem> buscaPorForum(@PathVariable("idForum") Long idForum){
+		Optional<Forum> forum = forumRepository.findById(idForum);
+		return repository.buscaPorForum(forum.get());
 	}
 	
 	

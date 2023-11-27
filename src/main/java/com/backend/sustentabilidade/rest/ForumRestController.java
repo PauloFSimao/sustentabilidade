@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import javax.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -96,9 +98,56 @@ public class ForumRestController {
 		Optional<Usuario> user = userRepository.findById(idUser);
 		forum.get().getIntegrantes().add(user.get());
 		repository.save(forum.get());
+		ForumIntegrante fi = new ForumIntegrante(user.get(), forum.get(), true);
+		fiRepository.save(fi);
 		Sucesso sucesso = new Sucesso(HttpStatus.OK, "Sucesso");
 		return new ResponseEntity<Object>(sucesso, HttpStatus.OK);
 	}
+	
+	@Transactional
+	//Método de sair do fórum
+	@RequestMapping(value = "/sair/{idForum}/{idUser}", method = RequestMethod.PUT)
+	public ResponseEntity<Object> sairForum(@PathVariable("idForum") Long idForum, @PathVariable("idUser") Long idUser){
+		Forum forum = repository.findById(idForum).get();
+		Usuario user = userRepository.findById(idUser).get();
+		
+		List<Usuario> participantes = forum.getIntegrantes();
+		for(int i = 0; i < participantes.size(); i++) {
+			if(participantes.get(i).getId() == idUser) {
+				participantes.remove(i);
+				break;
+			}
+		}
+		
+		forum.setIntegrantes(participantes);
+		repository.save(forum);
+		
+		
+		fiRepository.deleteByForumAndParticipante(forum, user);
+		Sucesso sucesso = new Sucesso(HttpStatus.OK, "Sucesso");
+		return new ResponseEntity<Object>(sucesso, HttpStatus.OK);
+		
+	}
+	
+	//Método que pega todos os fóruns que um usuário participa
+	@RequestMapping(value = "/{idUser}", method = RequestMethod.GET)
+	public List<Forum> listaDoParticipante(@PathVariable("idUser") Long idUser){
+		Optional<Usuario> user = userRepository.findById(idUser);
+		return fiRepository.buscaPorParticipante(user.get());
+	}
+	
+	// Método que pega o fórum pelo ID
+	@RequestMapping(value = "/id/{id}")
+	public Optional<Forum> findById(@PathVariable("id") Long id){
+		return repository.findById(id);
+	}
+	
+	//Método que busca por nome ou descrição
+	@RequestMapping(value = "/palavra/{palavra}", method = RequestMethod.GET)
+	public List<Forum> buscaPorDescNome(@PathVariable("palavra") String palavra){
+		return repository.buscaPorDesNome(palavra);
+	}
+	
 	
 	
 }

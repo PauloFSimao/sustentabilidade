@@ -1,6 +1,7 @@
 package com.backend.sustentabilidade.rest;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
@@ -56,9 +57,26 @@ public class MensagemRestController {
 		return repository.findEntreUser(dest, rem);
 	}
 	
+	// Método que busca o histórico de conversa
 	@RequestMapping(value = "/{idRem}", method = RequestMethod.GET)
 	public List<Usuario> buscaHistorico(@PathVariable("idRem") Long id){
 		Usuario rem = userRepository.findById(id).get();
-		return repository.buscaHistorico(rem);
+		ArrayList<Usuario> users = (ArrayList<Usuario>) repository.buscaRecebidos(rem);
+		
+		List<Usuario> enviados = repository.buscaEnviados(rem);
+		
+		for(int i = 0; i < enviados.size(); i++) {
+			boolean igual = false;
+			for(int j = 0; j < users.size(); j++) {
+				if(enviados.get(i) == users.get(j)) {
+					igual = true;
+				}
+			}
+			if(igual == false) {
+				users.add(enviados.get(i));
+			}
+		}
+		
+		return users;
 	}
 }
