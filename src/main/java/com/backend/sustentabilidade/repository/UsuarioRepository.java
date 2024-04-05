@@ -21,4 +21,7 @@ public interface UsuarioRepository extends PagingAndSortingRepository<Usuario, L
 	@Query("SELECT u FROM Usuario u WHERE u.email = :email")
 	public Optional<Usuario> findByEmail(@Param("email") String email);	
 	
+	@Query("SELECT u FROM Usuario u WHERE u.userName = :uname")
+	public Optional<Usuario> findByUserName(@Param("uname") String string);
+	
 }

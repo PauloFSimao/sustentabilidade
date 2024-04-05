@@ -46,10 +46,20 @@ public class UsuarioRestController {
 	// Método que cadastra o usuário
 	@RequestMapping(value = "", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Object> salvarUsuario(@RequestBody Usuario user){
+		
 		if(user != null) {
+			if(!repository.findByUserName(user.getUserName()).isEmpty()) {
+				Erro erro = new Erro(HttpStatus.UNAUTHORIZED, "Username já cadastrado!");
+				return new ResponseEntity<Object>(erro,  HttpStatus.UNAUTHORIZED);
+			}
+			if(!repository.findByEmail(user.getEmail()).isEmpty()) {
+				Erro erro = new Erro(HttpStatus.UNAUTHORIZED, "Email já cadastrado!");
+				return new ResponseEntity<Object>(erro,  HttpStatus.UNAUTHORIZED);
+			}
+			
 			// criptografando senha do usuário
 			String crip = encoder.encode(user.getSenha());
-			user.setSenha(crip);
+			user.setSenha(crip); 
 			
 			repository.save(user);
 			Sucesso sucesso = new Sucesso(HttpStatus.OK, "Sucesso");
@@ -168,8 +178,14 @@ public class UsuarioRestController {
 				resp[3] = user.get().getFoto();
 				
 				return ResponseEntity.ok(resp);
+			
+			} else {
+				Erro erro = new Erro(HttpStatus.UNAUTHORIZED, "Email ou senha incorretos!");
+				return new ResponseEntity<Object>(erro, HttpStatus.UNAUTHORIZED);
 			}
+		} else {
+			Erro erro = new Erro(HttpStatus.UNAUTHORIZED, "Email não cadastrado!");
+			return new ResponseEntity<Object>(erro, HttpStatus.UNAUTHORIZED);
 		}
-		return new ResponseEntity<Object>(HttpStatus.UNAUTHORIZED);
 	}
 }

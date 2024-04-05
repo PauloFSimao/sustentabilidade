@@ -29,7 +29,7 @@ public class AppConfig implements WebMvcConfigurer{
 	@Bean
 	public DataSource dataSource() {
 		DriverManagerDataSource driver = new DriverManagerDataSource();
-		driver.setUrl("jdbc:mysql://localhost/sustentabilidade?useTimezone=true&serverTimezone=UTC");
+		driver.setUrl("jdbc:mysql://localhost/sustentabilidade?useTimezone=true&serverTimezone=UTC&useSSl=false");
 		driver.setUsername("root");
 		driver.setPassword("root");
 		driver.setDriverClassName("com.mysql.cj.jdbc.Driver");
