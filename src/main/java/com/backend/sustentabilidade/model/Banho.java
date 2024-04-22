@@ -29,7 +29,33 @@ public class Banho {
 	@NotNull
 	private LocalTime tempo;
 	
+	@NotNull
+	private TipoChuveiro tipoChuv;
+	
+	private double vazaoChuv;
+	
+	private double consumo;
+	
 	private int pontos;
+	
+	public TipoChuveiro getTipoChuv() {
+		return tipoChuv;
+	}
+	public void setTipoChuv(TipoChuveiro tipoChuv) {
+		this.tipoChuv = tipoChuv;
+	}
+	public double getVazaoChuv() {
+		return vazaoChuv;
+	}
+	public void setVazaoChuv(double vazaoChuv) {
+		this.vazaoChuv = vazaoChuv;
+	}
+	public double getConsumo() {
+		return consumo;
+	}
+	public void setConsumo(double consumo) {
+		this.consumo = consumo;
+	}
 	
 	public Long getId() {
 		return id;
