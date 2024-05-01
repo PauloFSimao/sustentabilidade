@@ -15,7 +15,10 @@ import com.backend.sustentabilidade.model.Banho;
 public interface BanhoRepository extends PagingAndSortingRepository<Banho, Long>{
 	
 	//select * from sustentabilidade.banho as b where b.data between "2004-03-01" and "2004-03-31";
-	@Query("SELECT b FROM Banho b WHERE b.data >= :inicio AND b.data <= :fim")	
-	public List<Banho> buscaBanhosMes(@Param("inicio") Calendar inicio, @Param("fim") Calendar fim);
+	@Query("SELECT b FROM Banho b WHERE b.data >= :inicio AND b.data <= :fim AND b.usuario.id = :idUser")	
+	public List<Banho> buscaBanhosMes(@Param("inicio") Calendar inicio, @Param("fim") Calendar fim, @Param("idUser") Long idUser);
+	
+	@Query("SELECT b FROM Banho b WHERE b.usuario.id = :idUser")
+	public List<Banho> buscaBanhosUser(@Param("idUser") Long idUser);
 	
 }

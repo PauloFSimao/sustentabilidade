@@ -46,6 +46,8 @@ public class BanhoRestController {
 				banho.setPontos(10);
 			}
 			
+			banho.getUsuario().setPontuacao(banho.getUsuario().getPontuacao() + banho.getPontos());
+			
 			Double time = (double) banho.getTempo().getMinute() + ((double) banho.getTempo().getSecond() / 100);
 			
 			if(banho.getVazaoChuv() == 0 && banho.getTipoChuv() == TipoChuveiro.CHUVEIRO) {
@@ -72,8 +74,8 @@ public class BanhoRestController {
 	}
 	
 	// Método que pega todos os banhos do mês de um usuário e faz relatório
-	@RequestMapping(value = "/mes/{mes}/{ano}", method = RequestMethod.GET)
-	public ResponseEntity<Object> buscaBanhos(@PathVariable("mes") String mesS, @PathVariable("ano") int ano){
+	@RequestMapping(value = "/{idUser}/{mes}/{ano}", method = RequestMethod.GET)
+	public ResponseEntity<Object> buscaBanhos(@PathVariable("mes") String mesS, @PathVariable("ano") int ano, @PathVariable("idUser") Long idUser){
 		
 		int ultimo = 0;
 		int mes = Integer.parseInt(mesS);
@@ -89,29 +91,41 @@ public class BanhoRestController {
 		inicio.set(ano, mes, 1);
 		Calendar fim = Calendar.getInstance();
 		fim.set(ano, mes, ultimo);
-		List<Banho> banhos = repository.buscaBanhosMes(inicio, fim);
+		List<Banho> banhos = repository.buscaBanhosMes(inicio, fim, idUser);
 		
 		if(!banhos.isEmpty()) {
 			Relatorio relatorio = new Relatorio();
+			Object result[] = new Object[2];
 			
 			LocalTime time = LocalTime.of(0, 0);
 			double consumo = 0;	
 			int pontos = 0;
 			double esperado = 0;
+			int chuveiro = 0;
+			int ducha = 0;
 			
 			for (Banho banho : banhos) {
 				time = time.plusMinutes(banho.getTempo().getMinute()).plusSeconds(banho.getTempo().getSecond());
 				consumo += banho.getConsumo();
 				pontos += banho.getPontos();
 				esperado += banho.getVazaoChuv() * 5;
+				if(banho.getTipoChuv() == TipoChuveiro.CHUVEIRO) {
+					chuveiro++;
+				}else {
+					ducha++;
+				}
 			}
 			int minutos = time.getMinute() / banhos.size();
 			int segundos = time.getSecond() / banhos.size();
 			if(time.getMinute() % banhos.size() != 0) {
 				segundos += 30;
 			}
-			System.out.println(minutos);
-			System.out.println(segundos);
+			
+			List<Banho> todosBanhos = repository.buscaBanhosUser(idUser);
+			double consumoTotal = 0;
+			for (Banho banho : todosBanhos) {
+				consumoTotal += banho.getConsumo();
+			}
 
 			LocalTime timeMedia = LocalTime.of(0, minutos, segundos);
 			relatorio.setConsumo(consumo);
@@ -120,10 +134,21 @@ public class BanhoRestController {
 			relatorio.setTempoTotal(time);
 			relatorio.setTempoMedia(timeMedia);
 			relatorio.setEsperado(esperado);
+			relatorio.setBio(banhos.get(0).getUsuario().getBio());
+			relatorio.setConsumoTotal(consumoTotal);
+			relatorio.setQtdBanhoTotal(todosBanhos.size());
+			relatorio.setPontuacaoTotal(banhos.get(0).getUsuario().getPontuacao());
+			relatorio.setConsumoBanho(consumoTotal / todosBanhos.size());
+			relatorio.setQtdChuveiro(chuveiro);
+			relatorio.setQtdDucha(ducha);
+			
+			result[0] = relatorio;
+			result[1] = banhos;
 		
-			return new ResponseEntity<Object>(relatorio, HttpStatus.OK);
+			return new ResponseEntity<Object>(result, HttpStatus.OK);
 		}
 		Erro erro = new Erro(HttpStatus.INTERNAL_SERVER_ERROR, "Não há banhos registrados!");
 		return new ResponseEntity<Object>(erro, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
+	
 }

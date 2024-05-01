@@ -49,6 +49,16 @@ public class Usuario {
 	
 	@Column(columnDefinition = "LONGTEXT")
 	private String foto;
+	
+	private int pontuacao;
+
+	public int getPontuacao() {
+		return pontuacao;
+	}
+
+	public void setPontuacao(int pontuacao) {
+		this.pontuacao = pontuacao;
+	}
 
 	public List<Forum> getForuns() {
 		return foruns;
