@@ -21,4 +21,8 @@ public interface BanhoRepository extends PagingAndSortingRepository<Banho, Long>
 	@Query("SELECT b FROM Banho b WHERE b.usuario.id = :idUser")
 	public List<Banho> buscaBanhosUser(@Param("idUser") Long idUser);
 	
+	//select usuario_id, sum(pontos) from banho as b where b.data between "2004-04-01" and "2004-04-30" group by usuario_id order by sum(pontos) desc;
+	//@Query("SELECT new Banho (b.usuario, sum(b.pontos) FROM Banho b WHERE b.data BETWEEN ':inicio' AND ':fim' GROUP BY b.usuario.id ORDER BY SUM(pontos)")
+	//public List<Banho> buscaRanking(@Param("inicio") Calendar inicio, @Param("fim") Calendar fim);
+	
 }

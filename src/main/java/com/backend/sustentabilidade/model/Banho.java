@@ -38,6 +38,23 @@ public class Banho {
 	
 	private int pontos;
 	
+	public Banho() {
+		
+	}
+	
+	public Banho(Long userId, long pontuacao, Long id, Calendar data, LocalTime time, TipoChuveiro chuv, double vazao, double cons) {
+		Usuario user = new Usuario();
+		user.setId(userId);
+		this.usuario = user;
+		this.pontos = (int) pontuacao;
+		this.consumo = cons;
+		this.data = data;
+		this.id = id;
+		this.tempo = time;
+		this.tipoChuv = chuv;
+		this.vazaoChuv = vazao;
+	}
+	
 	public TipoChuveiro getTipoChuv() {
 		return tipoChuv;
 	}

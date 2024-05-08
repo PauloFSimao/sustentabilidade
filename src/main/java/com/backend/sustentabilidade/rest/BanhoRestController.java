@@ -3,9 +3,14 @@ package com.backend.sustentabilidade.rest;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.Month;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
+
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,7 +28,9 @@ import com.backend.sustentabilidade.model.Erro;
 import com.backend.sustentabilidade.model.Relatorio;
 import com.backend.sustentabilidade.model.Sucesso;
 import com.backend.sustentabilidade.model.TipoChuveiro;
+import com.backend.sustentabilidade.model.Usuario;
 import com.backend.sustentabilidade.repository.BanhoRepository;
+import com.backend.sustentabilidade.repository.UsuarioRepository;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalTimeDeserializer;
 
 @CrossOrigin
@@ -34,6 +41,12 @@ public class BanhoRestController {
 	@Autowired
 	private BanhoRepository repository;
 	
+	@Autowired
+	private EntityManager em;
+	
+	@Autowired
+	private UsuarioRepository userRepository;
+		
 	// Método que salva o banho tomado pelo usuário
 	@RequestMapping(value = "", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Object> salvarBanho(@RequestBody Banho banho){
@@ -150,5 +163,50 @@ public class BanhoRestController {
 		Erro erro = new Erro(HttpStatus.INTERNAL_SERVER_ERROR, "Não há banhos registrados!");
 		return new ResponseEntity<Object>(erro, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
+	
+	// Método que retorna o ranking
+	@RequestMapping(value = "/ranking", method = RequestMethod.GET)
+	public List<Banho> buscaRanking(){
+		LocalDate dataAtual = LocalDate.now();
+		int ultimo = 0;
+		int mes = dataAtual.getMonthValue();
+		if(mes == 1 || mes == 3 || mes == 5 || mes == 7 || mes == 8 || mes == 10 || mes == 12) {
+			ultimo = 31;
+		}else if(mes == 2) {
+			ultimo = 29;
+		} else {
+			ultimo = 30;
+		}
+		
+		Calendar inicio = Calendar.getInstance();
+		Calendar fim = Calendar.getInstance();
+		inicio.set(dataAtual.getYear(), dataAtual.getMonth().getValue() - 1, 1);
+		fim.set(dataAtual.getYear(), dataAtual.getMonth().getValue() - 1, ultimo);
+		//System.out.println(inicio.get(2));
+		
+		
+		String queryStr = "Select new com.backend.sustentabilidade.model.Banho(b.usuario.id, sum(b.pontos), b.id, b.data, b.tempo, b.tipoChuv, b.vazaoChuv, b.consumo) from Banho b where b.data >= :inicio and b.data <= :fim group by b.usuario.id order by sum(pontos) desc";
+		System.out.println(em);
+		System.out.println(inicio);
+		System.out.println(fim);
+		
+		TypedQuery<Banho> tq = em.createQuery(queryStr, Banho.class);
+		tq.setParameter("inicio", inicio);
+		tq.setParameter("fim", fim);
+		System.out.println("executou");
+
+		ArrayList<Banho> result = new ArrayList<Banho>();
+		for(int i = 0; i < tq.getResultList().size(); i++) {
+			Banho banho = tq.getResultList().get(i);
+			Optional<Usuario> user = userRepository.findById(banho.getUsuario().getId());
+			if(!user.isEmpty()) {
+				banho.setUsuario(user.get());
+				result.add(banho);
+			}
+		}
+		System.out.println(result.get(0).getUsuario().getNome());
+		return result;
+	}
+	
 	
 }
