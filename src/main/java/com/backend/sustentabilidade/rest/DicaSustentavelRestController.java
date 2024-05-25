@@ -1,5 +1,7 @@
 package com.backend.sustentabilidade.rest;
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -66,5 +68,11 @@ public class DicaSustentavelRestController {
 		}
 		Erro erro = new Erro(HttpStatus.INTERNAL_SERVER_ERROR, "Não foi possível alterar a Dica Sustentável!");
 		return new ResponseEntity<Object>(erro, HttpStatus.INTERNAL_SERVER_ERROR);
+	}
+	
+	// Método que busca a Dica pelo id
+	@RequestMapping(value = "/{id}", method = RequestMethod.GET)
+	public Optional<DicaSustentavel> buscaPorId(@PathVariable("id") Long id){
+		return repository.findById(id);
 	}
 }

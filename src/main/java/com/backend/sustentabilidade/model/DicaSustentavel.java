@@ -22,6 +22,9 @@ public class DicaSustentavel {
 	@NotEmpty
 	private String material;
 	
+	@NotEmpty
+	private String titulo;
+	
 	@Column(columnDefinition = "LONGTEXT")
 	private String foto;
 	
@@ -33,6 +36,16 @@ public class DicaSustentavel {
 	@NotEmpty
 	private String tutorial;
 	
+	
+	
+	public String getTitulo() {
+		return titulo;
+	}
+
+	public void setTitulo(String titulo) {
+		this.titulo = titulo;
+	}
+
 	public String getTutorial() {
 		return tutorial;
 	}
