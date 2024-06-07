@@ -57,6 +57,7 @@ public class UsuarioRestController {
 				return new ResponseEntity<Object>(erro,  HttpStatus.UNAUTHORIZED);
 			}
 			
+			
 			// criptografando senha do usuário
 			String crip = encoder.encode(user.getSenha());
 			user.setSenha(crip); 
@@ -184,7 +185,7 @@ public class UsuarioRestController {
 				return new ResponseEntity<Object>(erro, HttpStatus.UNAUTHORIZED);
 			}
 		} else {
-			Erro erro = new Erro(HttpStatus.UNAUTHORIZED, "Email não cadastrado!");
+			Erro erro = new Erro(HttpStatus.UNAUTHORIZED, "Email ou senha incorretos!");
 			return new ResponseEntity<Object>(erro, HttpStatus.UNAUTHORIZED);
 		}
 	}

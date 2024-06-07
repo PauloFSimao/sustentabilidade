@@ -46,6 +46,7 @@ public class BanhoRestController {
 	
 	@Autowired
 	private UsuarioRepository userRepository;
+	
 		
 	// Método que salva o banho tomado pelo usuário
 	@RequestMapping(value = "", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -59,7 +60,9 @@ public class BanhoRestController {
 				banho.setPontos(10);
 			}
 			
-			banho.getUsuario().setPontuacao(banho.getUsuario().getPontuacao() + banho.getPontos());
+			Usuario user = userRepository.findById(banho.getUsuario().getId()).get();
+			user.setPontuacao(user.getPontuacao() + banho.getPontos());
+			userRepository.save(user);
 			
 			Double time = (double) banho.getTempo().getMinute() + ((double) banho.getTempo().getSecond() / 100);
 			
@@ -117,6 +120,8 @@ public class BanhoRestController {
 			int chuveiro = 0;
 			int ducha = 0;
 			
+			long segundosTotais = 0;
+			
 			for (Banho banho : banhos) {
 				time = time.plusMinutes(banho.getTempo().getMinute()).plusSeconds(banho.getTempo().getSecond());
 				consumo += banho.getConsumo();
@@ -127,11 +132,8 @@ public class BanhoRestController {
 				}else {
 					ducha++;
 				}
-			}
-			int minutos = time.getMinute() / banhos.size();
-			int segundos = time.getSecond() / banhos.size();
-			if(time.getMinute() % banhos.size() != 0) {
-				segundos += 30;
+				
+				segundosTotais += banho.getTempo().toSecondOfDay();
 			}
 			
 			List<Banho> todosBanhos = repository.buscaBanhosUser(idUser);
@@ -139,13 +141,16 @@ public class BanhoRestController {
 			for (Banho banho : todosBanhos) {
 				consumoTotal += banho.getConsumo();
 			}
+			
+			long longMedia = segundosTotais / banhos.size();
+			LocalTime mediaFinal = LocalTime.ofSecondOfDay(longMedia);
+			System.out.println(mediaFinal);
 
-			LocalTime timeMedia = LocalTime.of(0, minutos, segundos);
 			relatorio.setConsumo(consumo);
 			relatorio.setPontos(pontos);
 			relatorio.setQtdBanho(banhos.size());
 			relatorio.setTempoTotal(time);
-			relatorio.setTempoMedia(timeMedia);
+			relatorio.setTempoMedia(mediaFinal);
 			relatorio.setEsperado(esperado);
 			relatorio.setBio(banhos.get(0).getUsuario().getBio());
 			relatorio.setConsumoTotal(consumoTotal);

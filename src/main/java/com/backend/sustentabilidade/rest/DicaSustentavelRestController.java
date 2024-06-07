@@ -1,5 +1,6 @@
 package com.backend.sustentabilidade.rest;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +17,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.backend.sustentabilidade.model.DicaSustentavel;
 import com.backend.sustentabilidade.model.Erro;
 import com.backend.sustentabilidade.model.Sucesso;
+import com.backend.sustentabilidade.model.Usuario;
 import com.backend.sustentabilidade.repository.DicaSustentavelRepository;
+import com.backend.sustentabilidade.repository.UsuarioRepository;
 
 @CrossOrigin
 @RestController
@@ -26,11 +29,16 @@ public class DicaSustentavelRestController {
 	@Autowired
 	private DicaSustentavelRepository repository;
 	
+	@Autowired
+	private UsuarioRepository userRepository;
+	
 	//Método que salva a dica sustentável
 	@RequestMapping(value = "", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Object> salvarDicaSustentavel(@RequestBody DicaSustentavel dica){
 		if(dica != null) {
-			DicaSustentavel d = new DicaSustentavel();			
+			Usuario user = userRepository.findById(dica.getAutor().getId()).get();	
+			user.setPontuacao(user.getPontuacao() + 20);
+			userRepository.save(user);
 			repository.save(dica);
 			
 			Sucesso sucesso = new Sucesso(HttpStatus.OK, "Sucesso");
@@ -43,14 +51,19 @@ public class DicaSustentavelRestController {
 	// Método que lista todos as dicas sustentáveis
 	@RequestMapping(value = "", method = RequestMethod.GET)
 	public Iterable<DicaSustentavel> listarTodos(){
-		return repository.findAll();
+		return repository.listaDesc();
 	}
 	
 	// Método que deleta a dica sustentável
 	@RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
-	public ResponseEntity<Object> deletarDica(@PathVariable("id") Long id, DicaSustentavel dica){
-		if(dica.getId() == id) {
+	public ResponseEntity<Object> deletarDica(@PathVariable("id") Long id){
+		if(repository.existsById(id)) {
+			DicaSustentavel dica = repository.findById(id).get();
+			Usuario user = userRepository.findById(dica.getAutor().getId()).get();
+			user.setPontuacao(user.getPontuacao() - 20);
+			userRepository.save(user);
 			repository.deleteById(id);
+			
 			Sucesso sucesso = new Sucesso(HttpStatus.OK, "Sucesso");
 			return new ResponseEntity<Object>(sucesso, HttpStatus.OK);
 		}
@@ -74,5 +87,11 @@ public class DicaSustentavelRestController {
 	@RequestMapping(value = "/{id}", method = RequestMethod.GET)
 	public Optional<DicaSustentavel> buscaPorId(@PathVariable("id") Long id){
 		return repository.findById(id);
+	}
+	
+	// Método que busca todas as dicas feitas por um usuário
+	@RequestMapping(value = "/autor/{id}", method = RequestMethod.GET)
+	public List<DicaSustentavel> buscaPorAutor(@PathVariable("id") Long id){
+		return repository.LisbuscaPorAutor(id);
 	}
 }

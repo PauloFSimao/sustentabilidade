@@ -44,6 +44,13 @@ public class ForumRestController {
 	// Método que cria um novo Fórum
 	@RequestMapping(value = "", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Object> criarForum(@RequestBody Forum forum){
+		if(forum.getNome().isBlank()) {
+			Erro erro = new Erro(HttpStatus.INTERNAL_SERVER_ERROR, "Nome do Fórum é um campo obrigatório!");
+			return new ResponseEntity<Object>(erro, HttpStatus.INTERNAL_SERVER_ERROR);
+		}else if(forum.getDescricao().isBlank()) {
+			Erro erro = new Erro(HttpStatus.INTERNAL_SERVER_ERROR, "Descrição do Fórum é um campo obrigatório!");
+			return new ResponseEntity<Object>(erro, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 		if(forum != null) {
 			ArrayList<Usuario> participantes = new ArrayList<Usuario>();
 			participantes.add(forum.getCriador());
