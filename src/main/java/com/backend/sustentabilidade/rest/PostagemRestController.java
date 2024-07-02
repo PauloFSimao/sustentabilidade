@@ -48,10 +48,10 @@ public class PostagemRestController {
 		if(post != null) {
 			post.setData(LocalDate.now());
 			repository.save(post);
-			List<ForumIntegrante> ativos = fiRepository.buscaAtivos(post.getForum());
-			for(int i = 0; i < ativos.size(); i++) {
-				senderEmail.enviar(ativos.get(i).getParticipante().getEmail(), ativos.get(i).getForum().getNome(), ativos.get(i).getParticipante().getNome());
-			}
+			//List<ForumIntegrante> ativos = fiRepository.buscaAtivos(post.getForum());
+			//for(int i = 0; i < ativos.size(); i++) {
+				//senderEmail.enviar(ativos.get(i).getParticipante().getEmail(), ativos.get(i).getForum().getNome(), ativos.get(i).getParticipante().getNome());
+			//}
 			
 			Sucesso sucesso = new Sucesso(HttpStatus.OK, "Sucesso");
 			return new ResponseEntity<Object>(sucesso, HttpStatus.OK);

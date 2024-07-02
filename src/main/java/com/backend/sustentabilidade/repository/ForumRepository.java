@@ -16,4 +16,7 @@ public interface ForumRepository extends PagingAndSortingRepository<Forum, Long>
 	@Query("SELECT f FROM Forum f WHERE f.descricao LIKE %:nome% OR f.nome LIKE %:nome%")
 	public List<Forum> buscaPorDesNome(@Param("nome") String nome);
 	
+	@Query("SELECT f FROM Forum f ORDER BY f.id DESC")
+	public Iterable<Forum> findAllOrderByIdDesc();
+	
 }

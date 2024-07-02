@@ -69,7 +69,7 @@ public class ForumRestController {
 	// Método que lista todos os fóruns
 	@RequestMapping(value = "", method = RequestMethod.GET)
 	public Iterable<Forum> findAll(){
-		return repository.findAll();
+		return repository.findAllOrderByIdDesc();
 	}
 	
 	// Método que deleta o Fórum

@@ -1,5 +1,6 @@
 package com.backend.sustentabilidade.rest;
 
+import java.text.DecimalFormat;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.Month;
@@ -145,7 +146,9 @@ public class BanhoRestController {
 			long longMedia = segundosTotais / banhos.size();
 			LocalTime mediaFinal = LocalTime.ofSecondOfDay(longMedia);
 			System.out.println(mediaFinal);
-
+			
+			double consumoBanho = consumoTotal / todosBanhos.size();
+					
 			relatorio.setConsumo(consumo);
 			relatorio.setPontos(pontos);
 			relatorio.setQtdBanho(banhos.size());
@@ -156,7 +159,7 @@ public class BanhoRestController {
 			relatorio.setConsumoTotal(consumoTotal);
 			relatorio.setQtdBanhoTotal(todosBanhos.size());
 			relatorio.setPontuacaoTotal(banhos.get(0).getUsuario().getPontuacao());
-			relatorio.setConsumoBanho(consumoTotal / todosBanhos.size());
+			relatorio.setConsumoBanho(consumoBanho);
 			relatorio.setQtdChuveiro(chuveiro);
 			relatorio.setQtdDucha(ducha);
 			

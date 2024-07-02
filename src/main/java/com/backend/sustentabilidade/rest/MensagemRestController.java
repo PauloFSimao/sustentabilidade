@@ -77,6 +77,8 @@ public class MensagemRestController {
 			}
 		}
 		
+		System.out.println(users);
+		
 		return users;
 	}
 }
